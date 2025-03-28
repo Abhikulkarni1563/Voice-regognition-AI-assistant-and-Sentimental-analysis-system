@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RationMitra - AI Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f5f5f5; }
+        #chat-box { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px gray; }
+        #response { margin-top: 20px; font-weight: bold; }
+        button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        #voice-btn { background-color: green; color: white; transition: background 0.3s ease; }
+        #voice-btn.listening { background-color: red; }
+        #loading { display: none; font-size: 14px; color: gray; }
+    </style>
+</head>
+<body>
+
+    <div id="chat-box">
+        <h2>RationMitra - AI Chatbot</h2>
+        <p>Press the microphone button and speak your query.</p>
+        <button id="voice-btn">🎤 Speak Now</button>
+        <p id="loading">Listening...</p>
+        <p id="response"></p>
+        <audio id="audio-player" controls style="display: none;"></audio>
+    </div>
+
+    <script>
+        document.getElementById("voice-btn").addEventListener("click", function() {
+            let button = document.getElementById("voice-btn");
+            let loading = document.getElementById("loading");
+            button.innerText = "🎤 Listening...";
+            button.classList.add("listening");
+            loading.style.display = "block";
+
+            fetch("/chat_voice", { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                button.innerText = "🎤 Speak Now";
+                button.classList.remove("listening");
+                loading.style.display = "none";
+                
+                document.getElementById("response").innerText = "Ration Mitraa: " + data.response;
+                
+                if (data.audio) {
+                    let audioPlayer = document.getElementById("audio-player");
+                    audioPlayer.src = data.audio;
+                    audioPlayer.style.display = "block";
+                    audioPlayer.play();
+                }
+            })
+            .catch(() => {
+                button.innerText = "🎤 Speak Now";
+                button.classList.remove("listening");
+                loading.style.display = "none";
+            });
+        });
+    </script>
+
+</body>
+</html>
